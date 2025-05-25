@@ -1,0 +1,10 @@
+{
+  "publicRoutes": [
+    "/."
+  ],
+  "protectedRoutes": [ 
+    "/dashboard",   
+    "/clientes",   
+    "/clientes/create"   
+  ]
+}

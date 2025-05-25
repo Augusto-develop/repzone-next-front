@@ -1,0 +1,16 @@
+{
+  "name": "Next.js DevContainer",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "prototype-upd8-next",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "forwardPorts": [3000],
+  "postCreateCommand": "npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}

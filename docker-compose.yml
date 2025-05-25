@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+    prototype-upd8-next-front:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - PORT=3000
+            - CHOKIDAR_USEPOLLING=true
+        ports:
+            - '3500:3000'
+        volumes:
+            - ./next-front:/var/www:cached
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+            - "upd8:127.0.0.1"
+        networks:
+            - personwallet-network    
+
+networks:
+    personwallet-network:
+        external: true
