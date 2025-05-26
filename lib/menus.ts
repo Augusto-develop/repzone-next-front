@@ -67,7 +67,7 @@ export function getMenuList(pathname: string): Group[] {
             },
             {
               href: "/clientes/create",
-              label: "Adicionar",
+              label: "Cadastrar",
               active: pathname.includes("/clientes/create"),
               icon: "",
               children: [],
