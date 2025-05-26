@@ -1,18 +1,15 @@
-import NextAuth from "next-auth";
+import NextAuth, { DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { ZodError } from "zod";
-import { signInSchema } from "./lib/zod";
-import { saltAndHashPassword } from "@/lib/password";
 import { handleLogin } from "./action/login-actions";
 import { AuthResponse } from "./lib/model/auth-response";
-import { DefaultSession } from "next-auth"
 
 declare module "next-auth" {
     interface User {
         id?: string | undefined
         email?: string | null | undefined
         pwApiToken: string
-        name?: string | null | undefined        
+        name?: string | null | undefined
     }
 
     interface Session {
@@ -30,10 +27,11 @@ export const { handlers, auth } = NextAuth({
                 password: { label: "Password", type: "password" },
             },
             authorize: async (credentials) => {
+
                 try {
                     const { email, password } = credentials as {
                         email: string; password: string
-                    };                                       
+                    };
 
                     const authResponse: AuthResponse = await handleLogin(email, password);
 
@@ -51,7 +49,7 @@ export const { handlers, auth } = NextAuth({
                 } catch (error) {
                     if (error instanceof ZodError) {
                         return null;
-                    }
+                    }                    
                     console.error("Authorization error:", error);
                     return null;
                 }
