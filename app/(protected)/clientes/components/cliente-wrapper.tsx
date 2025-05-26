@@ -3,18 +3,19 @@ import { getClientes } from "@/action/cliente-actions";
 import { Button } from "@/components/ui/button";
 import { CleaveInput } from "@/components/ui/cleave";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
 import { useCustomMuiDatepickerTheme, useCustomSelectStyles } from "@/hooks/use-custom-input-styles";
 import dayjs from "@/lib/dayjs";
 import { InputsFilterCliente, PayloadFilterCliente } from "@/lib/model/types";
 import { estadoOptions, sexoOptions } from "@/lib/options-select";
+import { removeSpecialCharacters } from "@/lib/utils";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { Dayjs } from "dayjs";
-import { Filter, Loader2, Plus } from "lucide-react";
+import 'dayjs/locale/pt-br';
+import { Filter, Loader2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import React, { useEffect, useRef, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -22,12 +23,13 @@ import Select from "react-select";
 import { toast as toastify } from 'react-toastify';
 import { useClienteContext } from "./cliente-context";
 
+
 const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
-    const [open, setOpen] = useState<boolean>(false);
+
+    dayjs.locale('pt-br');
+
     const { clientes, setClientes, filter, setFilter } = useClienteContext();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { toast } = useToast()
-    const selectRef = useRef<any>(null);
     const dateInputRef = useRef<HTMLInputElement | null>(null);
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs().local());
 
@@ -35,17 +37,24 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
     const customStyles = useCustomSelectStyles(theme ?? "light");
     const themeCustomMuiDatepicker = useCustomMuiDatepickerTheme(theme === "dark" ? "dark" : "light");
 
+    const defaultValues: InputsFilterCliente = {
+        cpfFilter: "",
+        nomeFilter: "",
+        datanascFilter: null,
+        sexoFilter: null,
+        estadoFilter: null,
+        cidadeFilter: null,
+        isSubmitFilter: false,
+    }
 
-    const { handleSubmit, control, formState: { errors }, } = useForm<InputsFilterCliente>({
-        defaultValues: {
-            cpfFilter: "",
-            nomeFilter: "",
-            datanascFilter: undefined,
-            sexoFilter: undefined,
-            estadoFilter: undefined,
-            cidadeFilter: undefined,
-            isSubmitFilter: false,
-        },
+    const {
+        handleSubmit,
+        register,
+        control,
+        reset,
+        formState: { errors },
+    } = useForm<InputsFilterCliente>({
+        defaultValues
     });
 
     useEffect(() => {
@@ -59,7 +68,8 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
         data.isSubmitFilter = true;
 
         if (data.datanascFilter) {
-            if (!dayjs.isDayjs(data.datanascFilter) || !data.datanascFilter.isValid()) {                
+            if (data.datanascFilter && !dayjs(data.datanascFilter, "DD/MM/YYYY", true).isValid()) {
+
                 toastify('Data de nascimento inválida!', {
                     type: 'error',
                     autoClose: 3000,
@@ -76,8 +86,7 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
         }
 
         const payload: PayloadFilterCliente = {
-            ...data,
-            cpf: data.cpfFilter,
+            cpf: removeSpecialCharacters(data.cpfFilter ?? ""),
             nome: data.nomeFilter,
             datanasc: data.datanascFilter ? data.datanascFilter.format("YYYY-MM-DD") : "",
             sexo: data.sexoFilter?.value,
@@ -94,7 +103,7 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <div>            
+        <div>
             <h4 className="flex-none font-medium lg:text-2xl text-xl capitalize text-default-900">
                 Consulta Cliente
             </h4>
@@ -121,14 +130,10 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
                         />
                     </div>
                     <div className="space-y-1 flex-1 min-w-[250px]">
-                        <label
-                            htmlFor="nomeFilter"
-                            className="text-sm font-medium text-foreground"
-                        >
-                            Nome
-                        </label>
+                        <Label htmlFor="nomeFilter">Nome</Label>
                         <input
                             id="nomeFilter"
+                            {...register("nomeFilter")}
                             size={30}
                             placeholder=""
                             maxLength={150}
@@ -154,7 +159,7 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
                                         control={control}
                                         rules={{
                                             validate: (value) => {
-                                                if (value && (!value || !dayjs.isDayjs(value) || !value.isValid())) {
+                                                if (value && !dayjs(value, "DD/MM/YYYY", true).isValid()) {
                                                     toastify('Data de nascimento inválida!', {
                                                         type: 'error',
                                                         autoClose: 3000,
@@ -173,6 +178,7 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
                                         render={({ field }) => (
                                             <DesktopDatePicker
                                                 {...field}
+                                                format="DD/MM/YYYY"
                                                 onChange={(newValue) => {
                                                     setSelectedDate(newValue);
                                                     field.onChange(newValue);
@@ -205,12 +211,7 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
                     </div>
 
                     <div className="space-y-1 flex-1 min-w-[250px]">
-                        <label
-                            htmlFor="sexoFilter"
-                            className="text-sm font-medium text-foreground"
-                        >
-                            Sexo
-                        </label>
+                        <Label htmlFor="sexoFilter">Sexo</Label>
                         <Controller
                             name="sexoFilter"
                             control={control}
@@ -234,12 +235,7 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
                         />
                     </div>
                     <div className="space-y-1 flex-1 min-w-[250px]">
-                        <label
-                            htmlFor="estadoFilter"
-                            className="text-sm font-medium text-foreground"
-                        >
-                            Estado
-                        </label>
+                        <Label htmlFor="estadoFilter">Estado</Label>
                         <Controller
                             name="estadoFilter"
                             control={control}
@@ -263,12 +259,7 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
                         />
                     </div>
                     <div className="space-y-1 flex-1 min-w-[250px]">
-                        <label
-                            htmlFor="cidadeFilter"
-                            className="text-sm font-medium text-foreground"
-                        >
-                            Cidade
-                        </label>
+                        <Label htmlFor="cidadeFilter">Cidade</Label>
                         <Controller
                             name="cidadeFilter"
                             control={control}
@@ -294,21 +285,21 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
                 </div>
 
 
-                <div className="flex flex-wrap gap-4 justify-between w-full">
+                <div className="flex flex-wrap gap-4 justify-end w-full">
                     {isSubmitting ? (
-                        <Button size="md" color="primary" variant="soft" disabled>
+                        <Button size="md" color="primary" disabled>
                             <Loader2 className="me-2 h-4 w-4 animate-spin" />
                             Filtrar
                         </Button>
                     ) : (
-                        <Button size="md" color="primary" variant="soft" type="submit">
+                        <Button size="md" color="primary" type="submit">
                             <Filter className="w-4 h-4 me-2" />
-                            Filtrar
+                            Pesquisar
                         </Button>
                     )}
-                    <Button type="button" size="md" color="success" variant="soft" className="flex-none" onClick={() => setOpen(true)} >
-                        <Plus className="w-4 h-4 me-2" />
-                        <span>Adicionar</span>
+                    <Button size="md" color="info" variant="soft" type="button" onClick={() => reset(defaultValues)}>
+                        <Filter className="w-4 h-4 me-2" />
+                        Limpar
                     </Button>
                 </div>
             </form>

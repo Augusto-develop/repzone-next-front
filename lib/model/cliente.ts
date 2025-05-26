@@ -13,12 +13,12 @@ export type Cliente = {
 };
 
 export type InputsFilterCliente = {
-  cpfFilter: string;
-  nomeFilter: string;
-  datanascFilter?: Dayjs | undefined;
-  sexoFilter: SexoOption;
+  cpfFilter?: string;
+  nomeFilter?: string;
+  datanascFilter?: Dayjs;
+  sexoFilter?: SexoOption
   estadoFilter?: EstadoOption;
-  cidadeFilter: CidadeOption;
+  cidadeFilter?: CidadeOption;
   isSubmitFilter: boolean;
 }
 
@@ -37,9 +37,9 @@ export type InputsFormAddCliente = {
   cpf: string;
   nome: string;
   datanasc: Dayjs;
-  sexo: SexoOption;
+  sexo: SexoOption | undefined;
   endereco: string;
-  estado: EstadoOption;
-  cidade: CidadeOption;
+  estado: EstadoOption | undefined;
+  cidade: CidadeOption | undefined;
 }
 

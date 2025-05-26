@@ -1,6 +1,6 @@
 "use client";
 // React
-import React, { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Next
 import { useTheme } from "next-themes";
@@ -19,19 +19,15 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 
 // Actions
 import {
-  convertDtoToCliente
+  convertDtoToCliente,
+  createCliente,
+  editCliente as submitEditCliente
 } from "@/action/cliente-actions";
 import { ClienteDto } from "@/action/types.schema.dto";
 
 // Componentes UI
 import { Button } from "@/components/ui/button";
 import { CleaveInput } from "@/components/ui/cleave";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
 // Componentes locais
@@ -51,11 +47,25 @@ import {
 import { estadoOptions, sexoOptions } from "@/lib/options-select";
 import { removeSpecialCharacters } from "@/lib/utils";
 
-import { useToast } from "@/components/ui/use-toast";
+import { Row } from "@tanstack/react-table";
+import 'dayjs/locale/pt-br';
+import { Loader2, Save } from "lucide-react";
 import { toast as toastify } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const FormCliente = ({ }) => {
+interface FormTaskProps {
+  setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  dataCliente?: Cliente;
+  row?: Row<Cliente>;
+}
+
+const FormCliente = ({
+  setOpen = undefined,
+  dataCliente = undefined,
+  row = undefined
+}: FormTaskProps) => {
+
+  dayjs.locale('pt-br');
 
   const { clientes, setClientes, editCliente, filter } = useClienteContext();
 
@@ -64,34 +74,41 @@ const FormCliente = ({ }) => {
   const themeCustomMuiDatepicker = useCustomMuiDatepickerTheme(theme === "dark" ? "dark" : "light");
   const dateInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs().local());
-  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [backendErrors, setBackendErrors] = useState<{ [key: string]: string[] }>({});
 
   const submitCreate = async (data: InputsFormAddCliente): Promise<ClienteDto | undefined> => {
-
     const payload: ClienteDto = {
       id: data.id ?? "",
       cpf: removeSpecialCharacters(data.cpf),
       nome: data.nome,
-      datanasc: data.datanasc && dayjs.isDayjs(data.datanasc) && data.datanasc.isValid() ?
-        data.datanasc.format("YYYY-MM-DD") :
-        "",
-      sexo: data.sexo?.value,
+      datanasc: data.datanasc && dayjs.isDayjs(data.datanasc) && data.datanasc.isValid()
+        ? data.datanasc.format("YYYY-MM-DD")
+        : "",
+      sexo: data.sexo?.value ?? "",
       endereco: data.endereco,
-      estado: data.estado?.value,
-      cidade: data.cidade?.value
+      estado: data.estado?.value ?? "",
+      cidade: data.cidade?.value ?? "",
     };
 
-    console.log(data);
-    console.log(payload);
-
     try {
-      // return payload.id?.trim() !== "" ?
-      //   submitEditCliente(payload) :
-      //   createCliente(payload);
-      return payload;
+      return payload.id?.trim() !== ""
+        ? await submitEditCliente(payload)
+        : await createCliente(payload);
     } catch (error) {
-      console.error("Erro de requisição:", error);
+      // Lança o erro para o onSubmit tratar
+      throw error;
     }
+  };
+
+  const defaultValues: InputsFormAddCliente = {
+    cpf: "",
+    nome: "",
+    datanasc: dayjs(""),
+    sexo: undefined,
+    endereco: "",
+    estado: undefined,
+    cidade: undefined
   };
 
   const {
@@ -100,34 +117,97 @@ const FormCliente = ({ }) => {
     control,
     watch,
     setValue,
+    setError,
+    reset,
     formState: { errors },
-  } = useForm<InputsFormAddCliente>()
+  } = useForm<InputsFormAddCliente>({ defaultValues });
 
-  const onSubmit: SubmitHandler<InputsFormAddCliente> = async (data) => {
-
-    data.id = dataCliente?.id ?? undefined;
-
-    const clienteDto: ClienteDto | undefined = await submitCreate(data);
-    if (clienteDto) {
-      const row: Cliente = convertDtoToCliente(clienteDto);
-      data.id ?
-        editCliente(data.id, row) :
-        setClientes((prevRows) => [row, ...prevRows]);
-
-      toastify('Cliente adicionado com sucesso!', {
-        type: 'success',         // ou 'success', 'error', 'warning', 'default'
-        autoClose: 3000,
-        hideProgressBar: true,
-        position: 'bottom-center', // ou 'top-center', 'bottom-right', etc.
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "colored"
+  useEffect(() => {
+    if (dataCliente) {
+      reset({
+        id: dataCliente.id,
+        cpf: dataCliente.cpf,
+        nome: dataCliente.nome,
+        datanasc: dayjs(dataCliente.datanasc),
+        sexo: { label: dataCliente.sexo, value: dataCliente.sexo },
+        endereco: dataCliente.endereco,
+        estado: { label: dataCliente.estado, value: dataCliente.estado },
+        cidade: { label: dataCliente.cidade, value: dataCliente.cidade },
       });
     }
+  }, [dataCliente, reset]);
 
-    // setOpen(false)
-  }
+  const onSubmit: SubmitHandler<InputsFormAddCliente> = async (data) => {
+    setIsSubmitting(true);
+    setBackendErrors({});
+
+    try {
+      data.id = dataCliente?.id ?? undefined;
+
+      const clienteDto: ClienteDto | undefined = await submitCreate(data);
+
+      console.log(clienteDto);
+
+      if (clienteDto) {
+
+        if (!data.id) {
+          toastify('Cliente adicionado com sucesso!', {
+            type: 'success',
+            autoClose: 3000,
+            hideProgressBar: true,
+            position: 'bottom-center',
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "colored"
+          });
+          reset();
+
+        } else {
+          if (typeof setOpen === 'function') {
+            setOpen(false);
+          }
+
+          const rowEdit: Cliente = convertDtoToCliente(clienteDto);
+          editCliente(data.id, rowEdit);
+
+          if (row) {
+            setTimeout(() => {
+              row.toggleSelected(false);
+            }, 1500);
+          }
+
+          toastify('Cliente alterado com sucesso!', {
+            type: 'success',
+            autoClose: 3000,
+            hideProgressBar: true,
+            position: 'bottom-center',
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "colored"
+          });
+        }
+      }
+    } catch (error: any) {
+      // Espera um objeto com erros no formato { campo: [msg1, msg2] }
+      if (typeof error === "object" && error !== null) {
+        setBackendErrors(error);
+
+        // Marca cada erro no React Hook Form
+        Object.entries(error).forEach(([field, messages]) => {
+          setError(field as keyof InputsFormAddCliente, {
+            type: "server",
+            message: (messages as string[]).join(", "),
+          });
+        });
+      } else {
+        toastify(`Erro inesperado: ${error}`, { type: 'error' });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -136,8 +216,7 @@ const FormCliente = ({ }) => {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
       <div className="space-y-1">
-        <Label htmlFor="cpf"
-          className="text-sm font-medium text-foreground">CPF</Label>
+        <Label htmlFor="cpf">CPF</Label>
         <Controller
           name="cpf"
           control={control}
@@ -173,12 +252,7 @@ const FormCliente = ({ }) => {
         />
       </div>
       <div className="space-y-1">
-        <Label
-          htmlFor="nome"
-          className="text-sm font-medium text-foreground"
-        >
-          Nome
-        </Label>
+        <Label htmlFor="nome">Nome</Label>
         <input
           id="nome"
           {...register("nome", { required: "Nome é obrigatório" })}
@@ -200,8 +274,7 @@ const FormCliente = ({ }) => {
       </div>
       <div className="grid lg:grid-cols-2 grid-cols-1 gap-5">
         <div className="space-y-1">
-          <Label htmlFor="datanasc"
-            className="text-sm font-medium text-foreground">Data de Nascimento</Label>
+          <Label htmlFor="datanasc">Data de Nascimento</Label>
 
           <ThemeProvider theme={themeCustomMuiDatepicker}>
             <CssBaseline />
@@ -213,11 +286,18 @@ const FormCliente = ({ }) => {
                 <Controller
                   name="datanasc"
                   control={control}
-                  rules={{ required: "Data de nascimento é obrigatória" }}
+                  rules={{
+                    required: "Data de nascimento é obrigatória",
+                    validate: (value) =>
+                      !value || !dayjs(value, "DD/MM/YYYY", true).isValid()
+                        ? "Data inválida"
+                        : true
+                  }}
                   render={({ field }) => (
                     <>
                       <DesktopDatePicker
                         {...field}
+                        format="DD/MM/YYYY"
                         onChange={(newValue) => {
                           setSelectedDate(newValue);
                           field.onChange(newValue);
@@ -227,7 +307,7 @@ const FormCliente = ({ }) => {
                             id: "datanasc",
                             fullWidth: true,
                             error: !!errors.datanasc,
-                            helperText: "", // Esvazia para não exibir internamente
+                            helperText: "",
                             inputRef: dateInputRef,
                             sx: {
                               height: 50
@@ -253,11 +333,7 @@ const FormCliente = ({ }) => {
         </div>
 
         <div className="space-y-1">
-          <label
-            htmlFor="sexo"
-            className="text-sm font-medium text-foreground">
-            Sexo
-          </label>
+          <Label htmlFor="sexo">Sexo</Label>
           <Controller
             name="sexo"
             control={control}
@@ -301,12 +377,7 @@ const FormCliente = ({ }) => {
         </div>
       </div>
       <div className="space-y-1">
-        <Label
-          htmlFor="endereco"
-          className="text-sm font-medium text-foreground"
-        >
-          Endereço
-        </Label>
+        <Label htmlFor="endereco">Endereço</Label>
         <input
           id="endereco"
           {...register("endereco", { required: "Endereço é obrigatório" })}
@@ -327,12 +398,7 @@ const FormCliente = ({ }) => {
         )}
       </div>
       <div className="space-y-1">
-        <label
-          htmlFor="estado"
-          className="text-sm font-medium text-foreground"
-        >
-          Estado
-        </label>
+        <Label htmlFor="estado">Estado</Label>
         <Controller
           name="estado"
           control={control}
@@ -375,12 +441,7 @@ const FormCliente = ({ }) => {
         />
       </div>
       <div className="space-y-1">
-        <label
-          htmlFor="cidade"
-          className="text-sm font-medium text-foreground"
-        >
-          Cidade
-        </label>
+        <Label htmlFor="cidade">Cidade</Label>
         <Controller
           name="cidade"
           control={control}
@@ -423,7 +484,17 @@ const FormCliente = ({ }) => {
         />
       </div>
       <div className="flex justify-end">
-        <Button type="submit">Salvar</Button>
+        {isSubmitting ? (
+          <Button size="md" color="success" disabled>
+            <Loader2 className="me-2 h-4 w-4 animate-spin" />
+            Salvar
+          </Button>
+        ) : (
+          <Button size="md" color="success" type="submit">
+            <Save className="w-4 h-4 me-2" />
+            Salvar
+          </Button>
+        )}
       </div>
     </form>
 

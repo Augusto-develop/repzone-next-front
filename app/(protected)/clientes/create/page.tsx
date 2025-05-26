@@ -1,6 +1,5 @@
 "use client";
 // React
-import React from "react";
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -13,7 +12,9 @@ const CreateCliente = ({ }) => {
             <h4 className="flex-none font-medium lg:text-2xl text-xl capitalize text-default-900">
                 Cadastra Cliente
             </h4>
-            <FormCliente></FormCliente>
+            <div className="md:max-w-[520px] w-[90%]">
+                <FormCliente />
+            </div>
         </>
     );
 };

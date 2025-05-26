@@ -1,7 +1,6 @@
 'use client';
-import { dataClientes } from "@/app/(protected)/clientes/components/data-clientes";
 import { Cliente, PayloadFilterCliente } from "@/lib/model/types";
-import { convertToBrasilDate, formatCPF } from "@/lib/utils";
+import { convertToBrasilDate, formatCPF, removeSpecialCharacters } from "@/lib/utils";
 import fetchWithAuth from "./login-actions";
 import { ClienteDto } from "./types.schema.dto";
 
@@ -11,33 +10,29 @@ export const getClientes = async (
     // Monta a URL com os parâmetros opcionais
     const queryParams = new URLSearchParams();
 
-    // if (creditId) {
-    //     if (type && type === TypeCredit.DESPESAFIXA) {
-    //         queryParams.append('type', type);
-    //     } else {
-    //         queryParams.append('creditId', creditId);
-    //     }
-    // }
-    // if (mesfat) queryParams.append('mesfat', mesfat);
-    // if (anofat) queryParams.append('anofat', anofat);
+    if (payload) {
+        if (payload.cpf) queryParams.append("cpf", removeSpecialCharacters(payload.cpf));
+        if (payload.nome) queryParams.append("nome", payload.nome);
+        if (payload.datanasc) queryParams.append("datanasc", payload.datanasc);
+        if (payload.sexo) queryParams.append("sexo", payload.sexo);
+        if (payload.estado) queryParams.append("estado", payload.estado);
+        if (payload.cidade) queryParams.append("cidade", payload.cidade);
+    }
 
-    // const url = `/despesa${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/clientes${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
-    // // Faz a requisição
-    // const res = await fetchWithAuth(url, {
-    //     method: 'GET',
-    //     headers: {
-    //         'Content-Type': 'application/json'
-    //     }
-    // });
-
+    // Faz a requisição
+    const res = await fetchWithAuth(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
 
     let newData: Cliente[] = [];
 
-    // if (res.ok) {
-    if (true) {
-        // const data: ClienteDto[] = await res.json();
-        const data: ClienteDto[] = dataClientes;
+    if (res.ok) {
+        const data: ClienteDto[] = await res.json();
         newData = data.map((item) => convertDtoToCliente(item));
     } else {
         console.error('Erro ao buscar os dados');
@@ -49,7 +44,7 @@ export const createCliente = async (payload: ClienteDto): Promise<ClienteDto | u
 
     delete payload.id;
 
-    const res = await fetchWithAuth("/despesa", {
+    const res = await fetchWithAuth("/clientes", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -60,15 +55,17 @@ export const createCliente = async (payload: ClienteDto): Promise<ClienteDto | u
     if (res.ok) {
         const newClienteDto: ClienteDto = await res.json();
         return newClienteDto;
+    } else if (res.status === 422) {
+        const errorData = await res.json();
+        throw errorData.errors;
     }
 
-    // console.error("Erro ao enviar:", response.statusText)
-    return undefined;
+    throw new Error(`Erro inesperado: ${res.status}`);
 };
 
 export const editCliente = async (payload: ClienteDto): Promise<ClienteDto | undefined> => {
 
-    const res = await fetchWithAuth("/despesa/" + payload.id, {
+    const res = await fetchWithAuth("/clientes/" + payload.id, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json'
@@ -79,14 +76,14 @@ export const editCliente = async (payload: ClienteDto): Promise<ClienteDto | und
     if (res.ok) {
         const newClienteDto: ClienteDto = await res.json();
         return newClienteDto;
+    } else if (res.status === 422) {
+        const errorData = await res.json();
+        throw errorData.errors;
     }
-
-    // console.error("Erro ao enviar:", response.statusText)
-    return undefined;
 };
 
 export const deleteCliente = async (id: string): Promise<Response> => {
-    const res = await fetchWithAuth(`/despesa/${id}`, {
+    const res = await fetchWithAuth(`/clientes/${id}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'

@@ -39,14 +39,14 @@ import { Row } from "@tanstack/react-table";
 import 'react-toastify/dist/ReactToastify.css';
 import FormCliente from "./cliente-form-create";
 
-interface CreateTaskProps {
+interface EditTaskProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   row: Row<Cliente>;
-  dataCliente?: Cliente | null;
+  dataCliente?: Cliente | undefined;
 }
 
-const EditCliente = ({ open, setOpen, row, dataCliente = null }: CreateTaskProps) => {
+const EditCliente = ({ open, setOpen, row, dataCliente = undefined }: EditTaskProps) => {
 
   const { clientes, setClientes, editCliente, filter } = useClienteContext();
 
@@ -57,7 +57,7 @@ const EditCliente = ({ open, setOpen, row, dataCliente = null }: CreateTaskProps
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs().local());
   const { toast } = useToast()
 
-  const modalRef = useRef<HTMLDivElement>(null);  
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const handleOpenChange = (openState: boolean) => {
     setOpen(openState);
@@ -72,9 +72,9 @@ const EditCliente = ({ open, setOpen, row, dataCliente = null }: CreateTaskProps
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent ref={modalRef} className="md:max-w-[480px] w-[90%]">
         <DialogHeader>
-          <DialogTitle>Cadastro Cliente</DialogTitle>
+          <DialogTitle>Edita Cliente</DialogTitle>
         </DialogHeader>
-        <FormCliente />
+        <FormCliente dataCliente={dataCliente} setOpen={setOpen} row={row} />
       </DialogContent>
     </Dialog >
   );
