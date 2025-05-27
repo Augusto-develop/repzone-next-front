@@ -6,7 +6,8 @@ import React, { useRef, useState } from "react";
 import { useTheme } from "next-themes";
 
 // Bibliotecas externas
-import dayjs, { Dayjs } from "@/lib/dayjs";
+import dayjs from "@/lib/dayjs";
+import { Dayjs } from "dayjs";
 
 // MUI
 

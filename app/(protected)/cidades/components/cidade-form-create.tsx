@@ -6,7 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 
 // Bibliotecas externas
-import dayjs, { Dayjs } from "@/lib/dayjs";
+import dayjs from "@/lib/dayjs";
+import { Dayjs } from "dayjs";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import Select from "react-select";
 

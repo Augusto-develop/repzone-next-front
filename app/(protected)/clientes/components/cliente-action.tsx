@@ -64,7 +64,7 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
                     });
                 }
             } catch (error) {
-                toastify('Erro inesperado ao excluir cliente.' || 'Erro ao excluir cliente.', {
+                toastify('Erro inesperado ao excluir cliente.', {
                     type: 'error',
                     autoClose: false,
                     hideProgressBar: true,
@@ -73,8 +73,7 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
                     pauseOnHover: true,
                     draggable: true,
                     theme: "colored"
-                });
-                console.error(error);
+                });                
             }
         }
 

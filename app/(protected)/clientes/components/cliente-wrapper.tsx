@@ -32,7 +32,7 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
     const { setClientes, setFilter, setIsLoading } = useClienteContext();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const dateInputRef = useRef<HTMLInputElement | null>(null);
-    const [setSelectedDate] = useState<Dayjs | null>(dayjs().local());
+    const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs().local());
 
     const { theme } = useTheme();
     const customStyles = useCustomSelectStyles(theme ?? "light");

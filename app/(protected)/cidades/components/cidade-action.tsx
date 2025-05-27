@@ -65,7 +65,7 @@ const CidadeAction: React.FC<CidadeActionProps> = ({ cidade, row }) => {
                     });
                 }
             } catch (error) {
-                toastify('Erro inesperado ao excluir cidade.' || 'Erro ao excluir cidade.', {
+                toastify('Erro inesperado ao excluir cidade.', {
                     type: 'error',
                     autoClose: false,
                     hideProgressBar: true,
@@ -74,8 +74,7 @@ const CidadeAction: React.FC<CidadeActionProps> = ({ cidade, row }) => {
                     pauseOnHover: true,
                     draggable: true,
                     theme: "colored"
-                });
-                console.error(error);
+                });                
             }
         }
 
