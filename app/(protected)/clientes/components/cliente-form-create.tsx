@@ -7,7 +7,7 @@ import { useTheme } from "next-themes";
 
 // Bibliotecas externas
 import dayjs, { Dayjs } from "@/lib/dayjs";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
 import Select from "react-select";
 
 // MUI
@@ -41,12 +41,14 @@ import {
 
 // Tipos e constantes
 import {
+  CidadeOption,
   Cliente,
   InputsFormAddCliente
 } from "@/lib/model/types";
 import { estadoOptions, sexoOptions } from "@/lib/options-select";
 import { removeSpecialCharacters } from "@/lib/utils";
 
+import { getCidadesByUF } from "@/action/cidade-actions";
 import { Row } from "@tanstack/react-table";
 import 'dayjs/locale/pt-br';
 import { Loader2, Save } from "lucide-react";
@@ -80,15 +82,14 @@ const FormCliente = ({
   const submitCreate = async (data: InputsFormAddCliente): Promise<ClienteDto | undefined> => {
     const payload: ClienteDto = {
       id: data.id ?? "",
-      cpf: removeSpecialCharacters(data.cpf),
-      nome: data.nome,
+      cpf: removeSpecialCharacters(data.cpf ?? ""),
+      nome: data.nome ?? "",
       datanasc: data.datanasc && dayjs.isDayjs(data.datanasc) && data.datanasc.isValid()
         ? data.datanasc.format("YYYY-MM-DD")
         : "",
       sexo: data.sexo?.value ?? "",
-      endereco: data.endereco,
-      estado: data.estado?.value ?? "",
-      cidade: data.cidade?.value ?? "",
+      endereco: data.endereco ?? "",
+      cidade_id: data.cidade?.value ?? "",
     };
 
     try {
@@ -104,11 +105,11 @@ const FormCliente = ({
   const defaultValues: InputsFormAddCliente = {
     cpf: "",
     nome: "",
-    datanasc: dayjs(""),
-    sexo: undefined,
+    datanasc: null,
+    sexo: null,
     endereco: "",
-    estado: undefined,
-    cidade: undefined
+    estado: null,
+    cidade: null
   };
 
   const {
@@ -122,17 +123,57 @@ const FormCliente = ({
     formState: { errors },
   } = useForm<InputsFormAddCliente>({ defaultValues });
 
+
+  //loading cidades por estado
+  const estadoSelecionado = useWatch({ control, name: "estado" });
+  const [cidadeOptions, setCidadeOptions] = useState<CidadeOption[]>([]);
+  const [loadingCidades, setLoadingCidades] = useState(false);
+
+  useEffect(() => {
+    async function fetchCidades() {
+      if (estadoSelecionado?.value) {
+        setLoadingCidades(true);  // Inicia loading
+
+        try {
+          setValue("cidade", null);
+
+          const listCidades = await getCidadesByUF(estadoSelecionado.value);
+
+          if (listCidades && listCidades.length > 0) {
+            const listOptionsCidades: CidadeOption[] = listCidades.map(cidade => ({
+              label: cidade.nome,
+              value: cidade.id,
+            }));
+            setCidadeOptions(listOptionsCidades);
+          } else {
+            setCidadeOptions([]);
+          }
+        } catch (error) {
+          setCidadeOptions([]);
+          setValue("cidade", null);
+        } finally {
+          setLoadingCidades(false); // Finaliza loading
+        }
+      } else {
+        setCidadeOptions([]);
+        setValue("cidade", null);
+      }
+    }
+
+    fetchCidades();
+  }, [estadoSelecionado, setValue]);
+
   useEffect(() => {
     if (dataCliente) {
       reset({
         id: dataCliente.id,
         cpf: dataCliente.cpf,
         nome: dataCliente.nome,
-        datanasc: dayjs(dataCliente.datanasc),
+        datanasc: dayjs(dataCliente.datanasc, 'DD/MM/YYYY'),
         sexo: { label: dataCliente.sexo, value: dataCliente.sexo },
         endereco: dataCliente.endereco,
-        estado: { label: dataCliente.estado, value: dataCliente.estado },
-        cidade: { label: dataCliente.cidade, value: dataCliente.cidade },
+        estado: { label: dataCliente.cidade.estado, value: dataCliente.cidade.estado },
+        cidade: { label: dataCliente.cidade.nome, value: dataCliente.cidade.nome },
       });
     }
   }, [dataCliente, reset]);
@@ -161,7 +202,7 @@ const FormCliente = ({
             draggable: true,
             theme: "colored"
           });
-          reset();
+          reset(defaultValues);
 
         } else {
           if (typeof setOpen === 'function') {
@@ -451,8 +492,10 @@ const FormCliente = ({
               <Select
                 {...field}
                 classNamePrefix="select"
-                options={estadoOptions}
+                options={cidadeOptions}
                 isClearable
+                isLoading={loadingCidades}
+                isDisabled={loadingCidades || !estadoSelecionado}
                 onChange={(selected) => {
                   field.onChange(selected ?? undefined);
                 }}

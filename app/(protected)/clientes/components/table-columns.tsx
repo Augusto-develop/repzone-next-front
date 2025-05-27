@@ -62,20 +62,26 @@ export const columns: ColumnDef<Cliente>[] = [
   {
     accessorKey: "estado",
     header: "Estado",
-    cell: ({ row }) => (
-      <div className="font-medium text-sm leading-4 whitespace-nowrap">
-        {row.getValue("estado")}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const cidade = row.getValue("cidade") as { estado: string; };
+      return (
+        <div className="font-medium text-sm leading-4 whitespace-nowrap">
+          {cidade.estado}
+        </div>
+      );
+    }
   },
   {
     accessorKey: "cidade",
     header: "Cidade",
-    cell: ({ row }) => (
-      <div className="font-medium text-sm leading-4 whitespace-nowrap">
-        {row.getValue("cidade")}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const cidade = row.getValue("cidade") as { nome: string; };
+      return (
+        <div className="font-medium text-sm leading-4 whitespace-nowrap">
+          {cidade.nome}
+        </div>
+      );
+    }
   },
   {
     accessorKey: "sexo",

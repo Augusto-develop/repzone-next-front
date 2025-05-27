@@ -40,7 +40,7 @@ const ListTable = () => {
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = useState({});
 
-    const { clientes } = useClienteContext();
+    const { clientes, isLoading } = useClienteContext();
 
     const pageSize = useResponsivePageSize();
 
@@ -102,7 +102,16 @@ const ListTable = () => {
                             ))}
                         </TableHeader>
                         <TableBody>
-                            {table.getRowModel().rows?.length ? (
+                            {isLoading ? (
+                                <TableRow>
+                                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                                        <div className="flex items-center justify-center gap-2">
+                                            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-gray-500" />
+                                            Carregando...
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ) : table.getRowModel().rows?.length ? (
                                 table.getRowModel().rows.map((row) => (
                                     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                                         {row.getVisibleCells().map((cell) => (

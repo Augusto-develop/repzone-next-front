@@ -1,11 +1,12 @@
 "use client";
+import { getCidadesByUF } from "@/action/cidade-actions";
 import { getClientes } from "@/action/cliente-actions";
 import { Button } from "@/components/ui/button";
 import { CleaveInput } from "@/components/ui/cleave";
 import { Label } from "@/components/ui/label";
 import { useCustomMuiDatepickerTheme, useCustomSelectStyles } from "@/hooks/use-custom-input-styles";
 import dayjs from "@/lib/dayjs";
-import { InputsFilterCliente, PayloadFilterCliente } from "@/lib/model/types";
+import { CidadeOption, InputsFilterCliente, PayloadFilterCliente } from "@/lib/model/types";
 import { estadoOptions, sexoOptions } from "@/lib/options-select";
 import { removeSpecialCharacters } from "@/lib/utils";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -18,7 +19,7 @@ import 'dayjs/locale/pt-br';
 import { Filter, Loader2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import React, { useEffect, useRef, useState } from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
 import Select from "react-select";
 import { toast as toastify } from 'react-toastify';
 import { useClienteContext } from "./cliente-context";
@@ -28,10 +29,10 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
 
     dayjs.locale('pt-br');
 
-    const { clientes, setClientes, filter, setFilter } = useClienteContext();
+    const { setClientes, setFilter, setIsLoading } = useClienteContext();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const dateInputRef = useRef<HTMLInputElement | null>(null);
-    const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs().local());
+    const [setSelectedDate] = useState<Dayjs | null>(dayjs().local());
 
     const { theme } = useTheme();
     const customStyles = useCustomSelectStyles(theme ?? "light");
@@ -52,6 +53,7 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
         register,
         control,
         reset,
+        setValue,
         formState: { errors },
     } = useForm<InputsFilterCliente>({
         defaultValues
@@ -65,6 +67,7 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
 
     const onSubmit: SubmitHandler<InputsFilterCliente> = async (data) => {
         setIsSubmitting(true);
+        setIsLoading(true);
         data.isSubmitFilter = true;
 
         if (data.datanascFilter) {
@@ -81,6 +84,7 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
                     theme: "colored"
                 });
                 setIsSubmitting(false);
+                setIsLoading(false);
                 return;
             }
         }
@@ -100,7 +104,48 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
         setClientes(fetchedClientes);
         setFilter(payload);
         setIsSubmitting(false);
+        setIsLoading(false);
     };
+
+
+    //loading cidades por estado
+    const estadoSelecionado = useWatch({ control, name: "estadoFilter" });
+    const [cidadeOptions, setCidadeOptions] = useState<CidadeOption[]>([]);
+    const [loadingCidades, setLoadingCidades] = useState(false);
+
+    useEffect(() => {
+        async function fetchCidades() {
+            if (estadoSelecionado?.value) {
+                setLoadingCidades(true);  // Inicia loading
+
+                try {
+                    setValue("cidadeFilter", null);
+
+                    const listCidades = await getCidadesByUF(estadoSelecionado.value);
+
+                    if (listCidades && listCidades.length > 0) {
+                        const listOptionsCidades: CidadeOption[] = listCidades.map(cidade => ({
+                            label: cidade.nome,
+                            value: cidade.id,
+                        }));
+                        setCidadeOptions(listOptionsCidades);
+                    } else {
+                        setCidadeOptions([]);
+                    }
+                } catch (error) {
+                    setCidadeOptions([]);
+                    setValue("cidadeFilter", null);
+                } finally {
+                    setLoadingCidades(false); // Finaliza loading
+                }
+            } else {
+                setCidadeOptions([]);
+                setValue("cidadeFilter", null);
+            }
+        }
+
+        fetchCidades();
+    }, [estadoSelecionado, setValue]);
 
     return (
         <div>
@@ -267,9 +312,11 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
                                 <Select
                                     {...field}
                                     classNamePrefix="select"
-                                    options={estadoOptions}
+                                    options={cidadeOptions}
                                     styles={customStyles}
                                     isClearable
+                                    isLoading={loadingCidades}
+                                    isDisabled={loadingCidades || !estadoSelecionado}
                                     onChange={(selected) => {
                                         field.onChange(selected ?? undefined);
                                     }}

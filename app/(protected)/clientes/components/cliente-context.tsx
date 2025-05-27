@@ -1,15 +1,17 @@
 'use client';
 
-import { Cliente, InputsFilterCliente, PayloadFilterCliente } from "@/lib/model/types";
+import { Cliente, PayloadFilterCliente } from "@/lib/model/types";
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 
 interface ClienteContextType {
   filter: PayloadFilterCliente;
   setFilter: React.Dispatch<React.SetStateAction<PayloadFilterCliente>>;
   clientes: Cliente[];
-  setClientes: React.Dispatch<React.SetStateAction<Cliente[]>>; 
+  setClientes: React.Dispatch<React.SetStateAction<Cliente[]>>;
   deleteCliente: (id: string) => void;
   editCliente: (id: string, updatedData: Partial<Cliente>) => void;
+  isLoading: boolean;                 // NOVO
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ClienteContext = createContext<ClienteContextType | undefined>(undefined);
@@ -27,16 +29,18 @@ interface ClienteProviderProps {
 }
 
 export const ClienteProvider = ({ children }: ClienteProviderProps) => {
-  const [clientes, setClientes] = useState<Cliente[]>([]); 
+  const [clientes, setClientes] = useState<Cliente[]>([]);
   const [filter, setFilter] = useState<PayloadFilterCliente>({
     cpf: "",
     nome: "",
     datanasc: "",
-    sexo: "",   
+    sexo: "",
     estado: "",
     cidade: "",
     isSubmit: false
-  });  
+  });
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Delete a cliente by its ID
   const deleteCliente = (id: string) => {
@@ -58,7 +62,9 @@ export const ClienteProvider = ({ children }: ClienteProviderProps) => {
       deleteCliente,
       editCliente,
       filter,
-      setFilter   
+      setFilter,
+      isLoading,
+      setIsLoading
     }}>
       {children}
     </ClienteContext.Provider>
