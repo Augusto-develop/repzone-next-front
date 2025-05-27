@@ -101,8 +101,11 @@ export function convertDtoToCliente(clienteDto: ClienteDto): Cliente {
         nome: clienteDto.nome,
         datanasc: convertToBrasilDate(clienteDto.datanasc),
         sexo: clienteDto.sexo,
-        endereco: clienteDto.endereco,
-        estado: clienteDto.estado,
-        cidade: clienteDto.cidade,
+        endereco: clienteDto.endereco,             
+        cidade: {
+            id: clienteDto.cidade?.id ?? '',
+            estado: clienteDto.cidade?.estado ?? '',
+            nome: clienteDto.cidade?.nome ?? ''
+        }
     };
 }
