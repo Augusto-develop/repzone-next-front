@@ -7,12 +7,19 @@ export const useCustomSelectStyles = (theme: string) => {
       ...base,
       height: '40px',
       minHeight: '40px',
-      backgroundColor: theme === "dark" ? "#1f2937" : "#fff", // bg-gray-800 / bg-white
-      borderColor: theme === "dark" ? "#374151" : "#d1d5db", // border-gray-700 / border-gray-300
-      color: theme === "dark" ? "#f9fafb" : "#111827", // text-white / text-black
-      boxShadow: state.isFocused ? "0 0 0 1px #3b82f6" : base.boxShadow, // focus:ring-blue-500
+      backgroundColor: state.isDisabled
+        ? (theme === "dark" ? "#374151" : "#e5e7eb")  // cinza escuro ou claro para disabled
+        : (theme === "dark" ? "#1f2937" : "#fff"),
+      borderColor: state.isDisabled
+        ? (theme === "dark" ? "#4b5563" : "#d1d5db")  // borda cinza para disabled
+        : (theme === "dark" ? "#374151" : "#d1d5db"),
+      color: state.isDisabled
+        ? (theme === "dark" ? "#9ca3af" : "#6b7280")  // texto cinza para disabled
+        : (theme === "dark" ? "#f9fafb" : "#111827"),
+      boxShadow: state.isFocused && !state.isDisabled ? "0 0 0 1px #3b82f6" : base.boxShadow,
+      cursor: state.isDisabled ? 'not-allowed' : 'default',
       "&:hover": {
-        borderColor: "#3b82f6",
+        borderColor: state.isDisabled ? undefined : "#3b82f6",
       },
     }),
     menu: (base: any) => ({
@@ -22,21 +29,27 @@ export const useCustomSelectStyles = (theme: string) => {
     }),
     option: (base: any, state: any) => ({
       ...base,
-      backgroundColor: state.isFocused
-        ? theme === "dark"
-          ? "#374151"
-          : "#e5e7eb"
-        : "transparent",
-      color: theme === "dark" ? "#f9fafb" : "#111827",
+      backgroundColor: state.isDisabled
+        ? "transparent"
+        : state.isFocused
+          ? theme === "dark" ? "#374151" : "#e5e7eb"
+          : "transparent",
+      color: state.isDisabled
+        ? (theme === "dark" ? "#6b7280" : "#9ca3af")
+        : theme === "dark" ? "#f9fafb" : "#111827",
+      cursor: state.isDisabled ? 'not-allowed' : 'default',
     }),
-    singleValue: (base: any) => ({
+    singleValue: (base: any, state: any) => ({
       ...base,
-      color: theme === "dark" ? "#f9fafb" : "#111827",
+      color: state.isDisabled
+        ? (theme === "dark" ? "#9ca3af" : "#6b7280")
+        : (theme === "dark" ? "#f9fafb" : "#111827"),
     }),
   }), [theme]);
 
   return customStyles;
 };
+
 
 export const useCustomMuiDatepickerTheme = (themeMode: "dark" | "light"): Theme => {
   return useMemo(() => {

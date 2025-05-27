@@ -29,7 +29,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         handleLogin(email, password).then((token) => {
             if (token) { 
-                router.push('/dashboard');
+                router.push('/clientes');
                 toast.success("Successfully logged in");
             }
         }).catch((err: unknown) => {

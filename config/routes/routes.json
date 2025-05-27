@@ -5,6 +5,8 @@
   "protectedRoutes": [ 
     "/dashboard",   
     "/clientes",   
-    "/clientes/create"   
+    "/clientes/create", 
+    "/cidades",
+    "/cidades/create"
   ]
 }

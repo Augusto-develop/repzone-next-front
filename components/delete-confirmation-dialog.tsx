@@ -1,4 +1,4 @@
-import React, { useState, useTransition } from "react";
+import React, { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,9 +13,9 @@ import { toast } from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 
 const DeleteConfirmationDialog = ({
-  open, onClose, onConfirm, defaultToast = true, toastMessage = "Successfully deleted",
+  open, onClose, onConfirm, defaultToast = true, toastMessage = "Excluído com Sucesso",
   title = "Excluir ?",
-  description = "Esta ação não pode ser desfeita. Isso excluirá permanentemente seus dados de nossos servidores."
+  description = "Esta ação não pode ser desfeita."
 }: {
   open: boolean;
   onClose: () => void;
@@ -25,20 +25,25 @@ const DeleteConfirmationDialog = ({
   title?: string;
   description?: string;
 }) => {
-  const [isPending, startTransition] = useTransition();
+  const [loading, setLoading] = useState(false);
 
   const handleConfirm = async () => {
     if (!onConfirm) {
       onClose();
       return;
     }
-    await onConfirm();
 
-    onClose();
-    if (defaultToast) {
-      toast.success(toastMessage, {
-        position: "top-right",
-      });
+    setLoading(true);
+    try {
+      await onConfirm();
+      if (defaultToast) {
+        toast.success(toastMessage, { position: "top-right" });
+      }
+    } catch (error) {
+      toast.error("Erro ao excluir.");
+    } finally {
+      setLoading(false);
+      onClose();
     }
   };
 
@@ -46,23 +51,21 @@ const DeleteConfirmationDialog = ({
     <AlertDialog open={open}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle> {title}</AlertDialogTitle>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={onClose} disabled={loading}>
+            Cancelar
+          </AlertDialogCancel>
           <AlertDialogAction
-            className={isPending ? "pointer-events-none" : ""}
-            onClick={() =>
-              startTransition(() => {
-                handleConfirm(); // Não retorna a promise diretamente
-              })
-            }
+            className={`bg-red-600 hover:bg-red-700 text-white focus:ring-red-500 ${loading ? "pointer-events-none opacity-70" : ""}`}
+            onClick={handleConfirm}
           >
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isPending ? "Deleting.." : "Continue"}
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {loading ? "Excluindo..." : "Excluir"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

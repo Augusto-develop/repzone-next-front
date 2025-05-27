@@ -54,7 +54,7 @@ export function getMenuList(pathname: string): Group[] {
         {
           id: "changelog",
           href: "/clientes",
-          label: "clientes",
+          label: "Clientes",
           active: pathname.includes("/clientes"),
           icon: "heroicons:arrow-trending-up",
           submenus: [
@@ -69,6 +69,35 @@ export function getMenuList(pathname: string): Group[] {
               href: "/clientes/create",
               label: "Cadastrar",
               active: pathname.includes("/clientes/create"),
+              icon: "",
+              children: [],
+            }
+          ],
+        },
+      ],
+    },
+    {
+      groupLabel: "",
+      id: "cidades",
+      menus: [
+        {
+          id: "changelog",
+          href: "/cidades",
+          label: "Cidades",
+          active: pathname.includes("/cidades"),
+          icon: "heroicons:arrow-trending-up",
+          submenus: [
+            {
+              href: "/cidades",
+              label: "Consultar",
+              active: pathname.includes("/cidades"),
+              icon: "",
+              children: [],
+            },
+            {
+              href: "/cidades/create",
+              label: "Cadastrar",
+              active: pathname.includes("/cidades/create"),
               icon: "",
               children: [],
             }
