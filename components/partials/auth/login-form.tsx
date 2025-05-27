@@ -13,7 +13,7 @@ import React from 'react';
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { signIn } from "next-auth/react";
+import { getCsrfToken, signIn } from "next-auth/react";
 
 const schema = z.object({
   email: z.string().email({ message: "Your email is invalid." }),
@@ -42,10 +42,13 @@ const LoginForm = () => {
     },
   });
 
+  const csrfToken = await getCsrfToken();
+
   const onSubmit = async (data: z.infer<typeof schema>) => {
     const result = await signIn("credentials", {
       email: data.email,
       password: data.password,
+      csrfToken,
       redirect: false,
       callbackUrl: "/dashboard",
     });
