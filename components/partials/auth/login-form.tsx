@@ -52,6 +52,7 @@ const LoginForm = () => {
     });
 
     if (result?.error) {
+      toast.error(result?.error);
       toast.error("Credenciais inválidas. Tente novamente.");
     } else {
       toast.success("Successfully logged in");
