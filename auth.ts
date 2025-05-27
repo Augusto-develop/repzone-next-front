@@ -49,7 +49,7 @@ export const { handlers, auth } = NextAuth({
                 } catch (error) {
                     if (error instanceof ZodError) {
                         return null;
-                    }                    
+                    }
                     console.error("Authorization error:", error);
                     return null;
                 }
@@ -87,11 +87,12 @@ export const { handlers, auth } = NextAuth({
     },
     cookies: {
         sessionToken: {
-            name: "authjs.session-token",
+            name: process.env.NODE_ENV === "production" ? "__Secure-authjs.session-token" : "authjs.session-token",
             options: {
                 httpOnly: true,  // O cookie só é acessível via HTTP, não no JavaScript
                 secure: process.env.NODE_ENV === "production",  // Só envia o cookie via HTTPS em produção
-                sameSite: "strict",  // Impede que o cookie seja enviado em requisições de outros sites
+                // sameSite: "strict",  // Impede que o cookie seja enviado em requisições de outros sites
+                sameSite: "lax",
                 // maxAge: 30 * 24 * 60 * 60,
                 maxAge: 1 * 1 * 60 * 60,
                 path: "/",
