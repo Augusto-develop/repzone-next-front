@@ -40,6 +40,7 @@ export const { handlers, auth } = NextAuth({
                     };
 
                     const authResponse: AuthResponse = await handleLogin(email, password);
+                    console.log(authResponse);
 
                     if (!authResponse || !authResponse.token) {
                         throw new Error("Invalid credentials.");

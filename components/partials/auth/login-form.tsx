@@ -20,8 +20,7 @@ const schema = z.object({
   password: z.string().min(4, { message: "Password must be at least 4 characters." }),
 });
 
-// const LoginForm = () => {
-const LoginForm = ({ csrfToken }: { csrfToken: string }) => {
+const LoginForm = () => {
   const [isPending, startTransition] = React.useTransition();
   const router = useRouter();
   const [passwordType, setPasswordType] = React.useState("password");
@@ -43,11 +42,11 @@ const LoginForm = ({ csrfToken }: { csrfToken: string }) => {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof schema>) => {
+  const onSubmit = async (data: z.infer<typeof schema>) => {   
 
     const result = await signIn("credentials", {
       email: data.email,
-      password: data.password,
+      password: data.password,     
       redirect: false,
       callbackUrl: "/dashboard",
     });
@@ -63,7 +62,6 @@ const LoginForm = ({ csrfToken }: { csrfToken: string }) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mt-5 2xl:mt-7 space-y-4">
-      <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
       <div className="space-y-2">
         <Label htmlFor="email" className="font-medium text-default-600">Email</Label>
         <Input
