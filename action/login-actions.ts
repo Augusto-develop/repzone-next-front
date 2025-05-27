@@ -95,8 +95,8 @@ export default async function fetchWithAuth(
           ...options,
         });
       } catch {
-        if (typeof window !== "undefined") window.location.replace("/");
-        throw new Error("Token expirado e não foi possível renovar. Redirecionando...");
+        // if (typeof window !== "undefined") window.location.replace("/");
+        // throw new Error("Token expirado e não foi possível renovar. Redirecionando...");
       }
     }
 
