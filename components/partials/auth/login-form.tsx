@@ -42,14 +42,11 @@ const LoginForm = () => {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof schema>) => {
-
-    const csrfToken = await getCsrfToken();
+  const onSubmit = async (data: z.infer<typeof schema>) => {   
 
     const result = await signIn("credentials", {
       email: data.email,
-      password: data.password,
-      csrfToken,
+      password: data.password,     
       redirect: false,
       callbackUrl: "/dashboard",
     });
