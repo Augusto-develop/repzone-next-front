@@ -7,13 +7,13 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
+import { getCsrfToken, signIn } from "next-auth/react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { getCsrfToken, signIn } from "next-auth/react";
 
 const schema = z.object({
   email: z.string().email({ message: "Your email is invalid." }),
@@ -42,9 +42,10 @@ const LoginForm = () => {
     },
   });
 
-  const csrfToken = await getCsrfToken();
-
   const onSubmit = async (data: z.infer<typeof schema>) => {
+
+    const csrfToken = await getCsrfToken();
+
     const result = await signIn("credentials", {
       email: data.email,
       password: data.password,
