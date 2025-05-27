@@ -4,14 +4,9 @@ import Logo from "@/components/logo";
 import LoginForm from "@/components/partials/auth/login-form";
 import Social from "@/components/partials/auth/social";
 import { PwLogoAvatarIcon, PwLogoNameIcon } from "@/components/pwicons/pwicons";
-import { getCsrfToken } from "next-auth/react";
 import Link from 'next/link';
 
-
-export default async function Login3() {
-
-  const csrfToken = await getCsrfToken();
-
+const Login3 = () => {
   return (
     <>
       <div
@@ -47,7 +42,7 @@ s lg:w-1/2"
                   Faça login na sua conta para começar a usar o RepZone
                 </div>
               </div>
-              <LoginForm csrfToken={csrfToken || ''} />
+              <LoginForm />
               <div className=" relative border-b-[#9AA2AF] border-opacity-[16%] border-b pt-6">
                 <div className=" absolute inline-block  bg-default-50 dark:bg-default-100 left-1/2 top-1/2 transform -translate-x-1/2 px-4 min-w-max text-sm  text-default-500 font-normal ">
                   Ou continue com
@@ -66,3 +61,5 @@ s lg:w-1/2"
     </>
   );
 };
+
+export default Login3;
