@@ -39,8 +39,7 @@ export const { handlers, auth } = NextAuth({
                         email: string; password: string
                     };
 
-                    const authResponse: AuthResponse = await handleLogin(email, password);
-                    console.log(authResponse);
+                    const authResponse: AuthResponse = await handleLogin(email, password);                    
 
                     if (!authResponse || !authResponse.token) {
                         throw new Error("Invalid credentials.");

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
-import { getCsrfToken, signIn } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -42,17 +42,16 @@ const LoginForm = () => {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof schema>) => {   
+  const onSubmit = async (data: z.infer<typeof schema>) => {
 
     const result = await signIn("credentials", {
       email: data.email,
-      password: data.password,     
+      password: data.password,
       redirect: false,
       callbackUrl: "/dashboard",
     });
 
     if (result?.error) {
-      toast.error(result?.error);
       toast.error("Credenciais inválidas. Tente novamente.");
     } else {
       toast.success("Successfully logged in");
