@@ -11,7 +11,13 @@ export type ClienteDto = {
     nome: string;
     datanasc: string;
     sexo: string;
-    endereco: string;
+    endereco: string;    
+    cidade_id: string;
+    cidade?: CidadeDto;   
+};
+
+export type CidadeDto = {
+    id?: string;
     estado: string;
-    cidade: string;
+    nome: string;
 };
