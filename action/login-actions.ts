@@ -70,7 +70,7 @@ export default async function fetchWithAuth(
 
   try {
     let response = await fetch(`${url_dominio}${url_recurso}`, {
-      credentials: 'include', // <- Necessário para enviar cookies (CSRF/session)
+      // credentials: 'include', // <- Necessário para enviar cookies (CSRF/session)
       ...options,
     });
 
@@ -91,7 +91,7 @@ export default async function fetchWithAuth(
         };
 
         response = await fetch(`${url_dominio}${url_recurso}`, {
-          credentials: 'include', // <- Também aqui
+          // credentials: 'include', // <- Também aqui
           ...options,
         });
       } catch {
