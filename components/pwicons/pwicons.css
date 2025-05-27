@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'pwicons';
-  src:  url('fonts/pwicons.eot?pwxci');
-  src:  url('fonts/pwicons.eot?pwxci#iefix') format('embedded-opentype'),
-    url('fonts/pwicons.ttf?pwxci') format('truetype'),
-    url('fonts/pwicons.woff?pwxci') format('woff'),
-    url('fonts/pwicons.svg?pwxci#pwicons') format('svg');
+  src:  url('fonts/pwicons.eot?rcbxjj');
+  src:  url('fonts/pwicons.eot?rcbxjj#iefix') format('embedded-opentype'),
+    url('fonts/pwicons.ttf?rcbxjj') format('truetype'),
+    url('fonts/pwicons.woff?rcbxjj') format('woff'),
+    url('fonts/pwicons.svg?rcbxjj#pwicons') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -27,65 +27,15 @@
 
 .iconpw-upd8mini .path1:before {
   content: "\e939";
-  color: rgb(254, 254, 254);
+  color: rgb(54, 161, 218);
 }
 .iconpw-upd8mini .path2:before {
   content: "\e93a";
   margin-left: -1em;
-  color: rgb(54, 161, 218);
+  color: rgb(242, 140, 48);
 }
 .iconpw-upd8mini .path3:before {
   content: "\e93b";
-  margin-left: -1em;
-  color: rgb(29, 55, 103);
-}
-.iconpw-upd8mini .path4:before {
-  content: "\e93c";
-  margin-left: -1em;
-  color: rgb(29, 55, 103);
-}
-.iconpw-upd8mini .path5:before {
-  content: "\e93d";
-  margin-left: -1em;
-  color: rgb(54, 161, 218);
-}
-.iconpw-upd8mini .path6:before {
-  content: "\e940";
-  margin-left: -1em;
-  color: rgb(29, 55, 103);
-}
-.iconpw-upd8mini .path7:before {
-  content: "\e942";
-  margin-left: -1em;
-  color: rgb(54, 161, 218);
-}
-.iconpw-upd8mini .path8:before {
-  content: "\e943";
-  margin-left: -1em;
-  color: rgb(48, 107, 160);
-}
-.iconpw-upd8mini .path9:before {
-  content: "\e944";
-  margin-left: -1em;
-  color: rgb(242, 140, 48);
-}
-.iconpw-upd8mini .path10:before {
-  content: "\e945";
-  margin-left: -1em;
-  color: rgb(48, 107, 160);
-}
-.iconpw-upd8mini .path11:before {
-  content: "\e946";
-  margin-left: -1em;
-  color: rgb(242, 140, 48);
-}
-.iconpw-upd8mini .path12:before {
-  content: "\e947";
-  margin-left: -1em;
-  color: rgb(48, 107, 160);
-}
-.iconpw-upd8mini .path13:before {
-  content: "\e94b";
   margin-left: -1em;
   color: rgb(48, 107, 160);
 }
