@@ -69,7 +69,10 @@ export default async function fetchWithAuth(
   }
 
   try {
-    let response = await fetch(`${url_dominio}${url_recurso}`, options);
+    let response = await fetch(`${url_dominio}${url_recurso}`, {
+      credentials: 'include', // <- Necessário para enviar cookies (CSRF/session)
+      ...options,
+    });
 
     const clone = response.clone();
     const data = await clone.json().catch(() => null);
@@ -87,7 +90,10 @@ export default async function fetchWithAuth(
           Authorization: `Bearer ${pwApiToken}`,
         };
 
-        response = await fetch(`${url_dominio}${url_recurso}`, options);
+        response = await fetch(`${url_dominio}${url_recurso}`, {
+          credentials: 'include', // <- Também aqui
+          ...options,
+        });
       } catch {
         if (typeof window !== "undefined") window.location.replace("/");
         throw new Error("Token expirado e não foi possível renovar. Redirecionando...");
@@ -100,6 +106,7 @@ export default async function fetchWithAuth(
     throw error;
   }
 }
+
 
 
 
