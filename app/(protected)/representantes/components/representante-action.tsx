@@ -1,32 +1,29 @@
 'use client'
-import { deleteCliente as executeDeleteCliente } from '@/action/cliente-actions';
+import { deleteRepresentante as executeDeleteRepresentante } from '@/action/representante-actions';
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import { Button } from "@/components/ui/button";
-import { Cliente } from "@/lib/model/types";
+import { Representante } from "@/lib/model/types";
 import { pwButtonIconTable } from '@/lib/pw-components-styles';
 import { Row } from "@tanstack/react-table";
-import { Headphones, SquarePen, Trash2 } from "lucide-react";
+import { SquarePen, Trash2 } from "lucide-react";
 import React, { useState } from 'react';
 import { toast as toastify } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useClienteContext } from './cliente-context';
-import EditCliente from './cliente-edit';
-import ClienteRepresentante from './cliente-representante';
+import { useRepresentanteContext } from './representante-context';
+import EditRepresentante from './representante-edit';
 
 
 // Add id as a prop to the component
-interface ClienteActionProps {
-    cliente: Cliente;
-    row: Row<Cliente>;
+interface RepresentanteActionProps {
+    representante: Representante;
+    row: Row<Representante>;
 }
 
-const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
+const RepresentanteAction: React.FC<RepresentanteActionProps> = ({ representante, row }) => {
     const [open, setOpen] = useState<boolean>(false);
-    const [openRepresentante, setOpenRepresentante] = useState<boolean>(false);
-    const { deleteCliente } = useClienteContext(); // Access context
+    const { deleteRepresentante } = useRepresentanteContext(); // Access context
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // State for dialog visibility
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null); // Store selected card ID for deletion
-
 
     // Handle delete button click
     const handleDeleteClick = (id: string) => {
@@ -38,10 +35,10 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
     const handleDeleteConfirm = async () => {
         if (selectedRowId) {
             try {
-                const res = await executeDeleteCliente(selectedRowId);
+                const res = await executeDeleteRepresentante(selectedRowId);
                 if (res.ok) {
-                    deleteCliente(selectedRowId);
-                    toastify('Cliente excluído com sucesso!', {
+                    deleteRepresentante(selectedRowId);
+                    toastify('Representante excluído com sucesso!', {
                         type: 'success',
                         autoClose: 3000,
                         hideProgressBar: true,
@@ -54,7 +51,7 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
                 } else {
                     const data = await res.json();
 
-                    toastify(data?.message || 'Erro ao excluir cliente.', {
+                    toastify(data?.message || 'Erro ao excluir representante.', {
                         type: 'error',
                         autoClose: false,
                         hideProgressBar: true,
@@ -66,7 +63,7 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
                     });
                 }
             } catch (error) {
-                toastify('Erro inesperado ao excluir cliente.', {
+                toastify('Erro inesperado ao excluir representante.', {
                     type: 'error',
                     autoClose: false,
                     hideProgressBar: true,
@@ -94,24 +91,13 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
         setOpen(true);
     };
 
-    const handleClickRepresentante = () => {
-        row.toggleSelected(true);
-        setOpenRepresentante(true);
-    };
-
     return (
         <>
-            <EditCliente
+            <EditRepresentante
                 open={open}
                 setOpen={setOpen}
                 row={row}
-                dataCliente={cliente}
-            />
-            <ClienteRepresentante
-                open={openRepresentante}
-                setOpen={setOpenRepresentante}
-                row={row}
-                dataCliente={cliente}
+                dataRepresentante={representante}
             />
             <DeleteConfirmationDialog
                 open={openDeleteDialog}
@@ -119,15 +105,6 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
                 onConfirm={handleDeleteConfirm} // Close dialog without deletion             
             />
             <div className="flex items-center gap-2">
-                <Button
-                    variant="outline"
-                    className={pwButtonIconTable}
-                    color="info"
-                    onClick={() => handleClickRepresentante()}
-                >
-                    <Headphones className="w-3 h-3" />
-                    Atendimento
-                </Button>
                 <Button
                     variant="outline"
                     className={pwButtonIconTable}
@@ -141,7 +118,7 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
                     variant="outline"
                     className={pwButtonIconTable}
                     color="destructive"
-                    onClick={() => handleDeleteClick(cliente.id)}
+                    onClick={() => handleDeleteClick(representante.id)}
                 >
                     <Trash2 className="w-3 h-3" />
                     Excluir
@@ -151,4 +128,4 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
     )
 }
 
-export default ClienteAction
+export default RepresentanteAction

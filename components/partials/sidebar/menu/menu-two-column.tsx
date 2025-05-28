@@ -1,9 +1,6 @@
 "use client";
 
-import React from 'react'
 import { useCustomRouter } from "@/components/navigation";
-
-
 import { getMenuList } from "@/lib/menus";
 
 
@@ -17,7 +14,7 @@ export function MenuTwoColumn() {
 
 
     const { pathname } = useCustomRouter();
-    
+
     const menuList = getMenuList(pathname);
 
     return (

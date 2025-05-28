@@ -317,6 +317,7 @@ const ClienteWrapper = ({ children }: { children: React.ReactNode }) => {
                                     isClearable
                                     isLoading={loadingCidades}
                                     isDisabled={loadingCidades || !estadoSelecionado}
+                                    placeholder={loadingCidades ? "Carregando..." : "Select"}
                                     onChange={(selected) => {
                                         field.onChange(selected ?? undefined);
                                     }}

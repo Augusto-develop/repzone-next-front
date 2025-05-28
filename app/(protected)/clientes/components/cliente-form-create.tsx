@@ -146,6 +146,9 @@ const FormCliente = ({
               value: cidade.id,
             }));
             setCidadeOptions(listOptionsCidades);
+            if (dataCliente) {
+              setValue("cidade", { label: dataCliente.cidade.nome, value: dataCliente.cidade.id });
+            }
           } else {
             setCidadeOptions([]);
           }
@@ -174,7 +177,7 @@ const FormCliente = ({
         sexo: { label: dataCliente.sexo, value: dataCliente.sexo },
         endereco: dataCliente.endereco,
         estado: { label: dataCliente.cidade.estado, value: dataCliente.cidade.estado },
-        cidade: { label: dataCliente.cidade.nome, value: dataCliente.cidade.nome },
+        cidade: { label: dataCliente.cidade.nome, value: dataCliente.cidade.id },
       });
     }
   }, [dataCliente, reset]);
@@ -497,6 +500,7 @@ const FormCliente = ({
                 isClearable
                 isLoading={loadingCidades}
                 isDisabled={loadingCidades || !estadoSelecionado}
+                placeholder={loadingCidades ? "Carregando..." : "Select"}
                 onChange={(selected) => {
                   field.onChange(selected ?? undefined);
                 }}

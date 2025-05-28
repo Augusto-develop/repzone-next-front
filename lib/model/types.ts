@@ -1,18 +1,13 @@
 
-import { Emissor, Bandeira } from "@/lib/model/enums";
+import { Bandeira, Emissor } from "@/lib/model/enums";
 
 export * from "./auth-response";
-export * from "./credit";
-export * from "./category";
-export * from "./expense";
-export * from "./wallet";
-export * from "./payment";
-export * from "./revenue";
-export * from "./movement";
-export * from "./cliente";
 export * from "./cidade";
+export * from "./cliente";
+export * from "./representante";
+export * from "./zona";
 
-export interface Option { 
+export interface Option {
     value: string;
     label: string;
     error?: string;
@@ -31,6 +26,12 @@ export type SexoOption = {
 };
 
 export type CidadeOption = {
+    label: string;
+    value: string;
+    error?: string;
+};
+
+export type RepresentanteOption = {
     label: string;
     value: string;
     error?: string;

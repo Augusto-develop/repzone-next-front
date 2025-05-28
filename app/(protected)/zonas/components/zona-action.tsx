@@ -1,32 +1,27 @@
 'use client'
-import { deleteCliente as executeDeleteCliente } from '@/action/cliente-actions';
+import { deleteZona as executeDeleteZona } from '@/action/zona-actions';
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import { Button } from "@/components/ui/button";
-import { Cliente } from "@/lib/model/types";
+import { Zona } from "@/lib/model/types";
 import { pwButtonIconTable } from '@/lib/pw-components-styles';
 import { Row } from "@tanstack/react-table";
-import { Headphones, SquarePen, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import React, { useState } from 'react';
 import { toast as toastify } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useClienteContext } from './cliente-context';
-import EditCliente from './cliente-edit';
-import ClienteRepresentante from './cliente-representante';
-
+import { useZonaContext } from './zona-context';
 
 // Add id as a prop to the component
-interface ClienteActionProps {
-    cliente: Cliente;
-    row: Row<Cliente>;
+interface ZonaActionProps {
+    zona: Zona;
+    row: Row<Zona>;
 }
 
-const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
+const ZonaAction: React.FC<ZonaActionProps> = ({ zona, row }) => {
     const [open, setOpen] = useState<boolean>(false);
-    const [openRepresentante, setOpenRepresentante] = useState<boolean>(false);
-    const { deleteCliente } = useClienteContext(); // Access context
-    const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // State for dialog visibility
-    const [selectedRowId, setSelectedRowId] = useState<string | null>(null); // Store selected card ID for deletion
-
+    const { deleteZona } = useZonaContext(); // Access context
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
     // Handle delete button click
     const handleDeleteClick = (id: string) => {
@@ -38,10 +33,10 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
     const handleDeleteConfirm = async () => {
         if (selectedRowId) {
             try {
-                const res = await executeDeleteCliente(selectedRowId);
+                const res = await executeDeleteZona(selectedRowId);
                 if (res.ok) {
-                    deleteCliente(selectedRowId);
-                    toastify('Cliente excluído com sucesso!', {
+                    deleteZona(selectedRowId);
+                    toastify('Zona de Atuação excluída com sucesso!', {
                         type: 'success',
                         autoClose: 3000,
                         hideProgressBar: true,
@@ -54,7 +49,7 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
                 } else {
                     const data = await res.json();
 
-                    toastify(data?.message || 'Erro ao excluir cliente.', {
+                    toastify(data?.message || 'Erro ao excluir zona de atuação.', {
                         type: 'error',
                         autoClose: false,
                         hideProgressBar: true,
@@ -66,7 +61,7 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
                     });
                 }
             } catch (error) {
-                toastify('Erro inesperado ao excluir cliente.', {
+                toastify('Erro inesperado ao excluir zona de atuação.', {
                     type: 'error',
                     autoClose: false,
                     hideProgressBar: true,
@@ -87,32 +82,10 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
     const handleDeleteCancel = () => {
         row.toggleSelected(false);
         setOpenDeleteDialog(false);
-    };
-
-    const handleClickEditar = () => {
-        row.toggleSelected(true);
-        setOpen(true);
-    };
-
-    const handleClickRepresentante = () => {
-        row.toggleSelected(true);
-        setOpenRepresentante(true);
-    };
+    };    
 
     return (
-        <>
-            <EditCliente
-                open={open}
-                setOpen={setOpen}
-                row={row}
-                dataCliente={cliente}
-            />
-            <ClienteRepresentante
-                open={openRepresentante}
-                setOpen={setOpenRepresentante}
-                row={row}
-                dataCliente={cliente}
-            />
+        <>            
             <DeleteConfirmationDialog
                 open={openDeleteDialog}
                 onClose={handleDeleteCancel}
@@ -122,26 +95,8 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
                 <Button
                     variant="outline"
                     className={pwButtonIconTable}
-                    color="info"
-                    onClick={() => handleClickRepresentante()}
-                >
-                    <Headphones className="w-3 h-3" />
-                    Atendimento
-                </Button>
-                <Button
-                    variant="outline"
-                    className={pwButtonIconTable}
-                    color="primary"
-                    onClick={() => handleClickEditar()}
-                >
-                    <SquarePen className="w-3 h-3" />
-                    Editar
-                </Button>
-                <Button
-                    variant="outline"
-                    className={pwButtonIconTable}
                     color="destructive"
-                    onClick={() => handleDeleteClick(cliente.id)}
+                    onClick={() => handleDeleteClick(`${zona.representante.id}:${zona.cidade.id}`)}
                 >
                     <Trash2 className="w-3 h-3" />
                     Excluir
@@ -151,4 +106,4 @@ const ClienteAction: React.FC<ClienteActionProps> = ({ cliente, row }) => {
     )
 }
 
-export default ClienteAction
+export default ZonaAction

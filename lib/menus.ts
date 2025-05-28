@@ -49,14 +49,14 @@ export function getMenuList(pathname: string): Group[] {
     },
     {
       groupLabel: "",
-      id: "clientes",
+      id: "cliente",
       menus: [
         {
-          id: "changelog",
+          id: "cliente",
           href: "/clientes",
           label: "Clientes",
           active: pathname.includes("/clientes"),
-          icon: "heroicons:arrow-trending-up",
+          icon: "heroicons:user",
           submenus: [
             {
               href: "/clientes",
@@ -81,11 +81,11 @@ export function getMenuList(pathname: string): Group[] {
       id: "cidades",
       menus: [
         {
-          id: "changelog",
+          id: "cidades",
           href: "/cidades",
           label: "Cidades",
           active: pathname.includes("/cidades"),
-          icon: "heroicons:arrow-trending-up",
+          icon: "heroicons:map",
           submenus: [
             {
               href: "/cidades",
@@ -107,33 +107,63 @@ export function getMenuList(pathname: string): Group[] {
     },
     {
       groupLabel: "",
-      id: "maps",
+      id: "representantes",
       menus: [
         {
-          id: "maps",
-          href: "/maps/maps-leaflet",
-          label: "maps",
-          active: pathname.includes("/maps/maps-leaflet"),
-          icon: "heroicons-outline:map",
+          id: "representantes",
+          href: "/representantes",
+          label: "Representantes",
+          active: pathname.includes("/representantes"),
+          icon: "heroicons:user-group",
           submenus: [
             {
-              href: "/maps/maps-leaflet",
-              label: "mapsLeaflet",
-              active: pathname.includes("/maps/maps-leaflet"),
+              href: "/representantes",
+              label: "Consultar",
+              active: pathname.includes("/representantes"),
               icon: "",
               children: [],
             },
             {
-              href: "/maps/maps-vector",
-              label: "mapsVector",
-              active: pathname.includes("/maps/maps-vector"),
+              href: "/representantes/create",
+              label: "Cadastrar",
+              active: pathname.includes("/representantes/create"),
               icon: "",
               children: [],
-            },
+            }
           ],
         },
       ],
-    }
+    },
+    {
+      groupLabel: "",
+      id: "zonas",
+      menus: [
+        {
+          id: "zonas",
+          href: "/zonas",
+          label: "Zonas de Atuação",
+          active: pathname.includes("/zonas"),
+          icon: "heroicons:map-pin",
+          submenus: [
+            {
+              href: "/zonas",
+              label: "Consultar",
+              active: pathname.includes("/zonas"),
+              icon: "",
+              children: [],
+            },
+            {
+              href: "/zonas/create",
+              label: "Cadastrar",
+              active: pathname.includes("/zonas/create"),
+              icon: "",
+              children: [],
+            }
+          ],
+        },
+      ],
+    },
+
   ];
 }
 export function getHorizontalMenuList(pathname: string): Group[] {
